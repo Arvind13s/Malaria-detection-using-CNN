@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MalariaVision — AI Blood Smear Analysis</title>
+  <meta name="description"
+    content="Detect malaria parasites in blood smear images using deep learning CNN. Upload a microscopy image for instant Parasitized or Uninfected classification." />
+  <meta property="og:title" content="MalariaVision — AI Blood Smear Analysis" />
+  <meta property="og:description"
+    content="AI-powered malaria detection from blood smear images using Convolutional Neural Networks." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- ═══════ Themed background: blood cells & parasites ═══════ -->
+  <div class="bg-cells" aria-hidden="true">
+    <!-- Red blood cells (biconcave discs) -->
+    <svg class="rbc rbc-1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.5" />
+      <circle cx="50" cy="50" r="18" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5" />
+    </svg>
+    <svg class="rbc rbc-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" fill="currentColor" opacity="0.08" />
+      <circle cx="50" cy="50" r="20" fill="var(--bg-primary)" opacity="0.6" />
+    </svg>
+    <svg class="rbc rbc-3" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.2" />
+      <circle cx="50" cy="50" r="16" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.4" />
+    </svg>
+    <svg class="rbc rbc-4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" fill="currentColor" opacity="0.06" />
+      <circle cx="50" cy="50" r="22" fill="var(--bg-primary)" opacity="0.5" />
+    </svg>
+    <svg class="rbc rbc-5" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1" />
+      <circle cx="50" cy="50" r="14" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.3" />
+    </svg>
+
+    <!-- Parasite ring-forms (small accents) -->
+    <svg class="parasite par-1" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="12 6" />
+      <circle cx="12" cy="14" r="4" fill="currentColor" opacity="0.7" />
+    </svg>
+    <svg class="parasite par-2" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="12" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="10 5" />
+      <circle cx="28" cy="16" r="3.5" fill="currentColor" opacity="0.6" />
+    </svg>
+    <svg class="parasite par-3" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="8 6" />
+      <circle cx="14" cy="24" r="3" fill="currentColor" opacity="0.5" />
+    </svg>
+  </div>
+
+  <!-- ═══════ NAVBAR ═══════ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <svg class="nav-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" stroke="url(#logoGrad)" stroke-width="2.5" fill="none" />
+        <circle cx="20" cy="20" r="6" fill="url(#logoGrad)" />
+        <circle cx="12" cy="14" r="3" fill="#ef4444" opacity="0.7" />
+        <circle cx="28" cy="26" r="2.5" fill="#ef4444" opacity="0.5" />
+        <defs>
+          <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40">
+            <stop offset="0%" stop-color="#2dd4bf" />
+            <stop offset="100%" stop-color="#14b8a6" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="nav-title">MalariaVision</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#upload-section">Analyze</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══════ HERO ═══════ -->
+  <header class="hero" id="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🔬 Deep Learning Powered</div>
+      <h1 class="hero-title">
+        Detect <span class="text-gradient">Malaria</span> from<br />Blood Smear Images
+      </h1>
+      <p class="hero-subtitle">
+        Upload a microscopy image and our CNN model will classify it as
+        <strong>Parasitized</strong> or <strong>Uninfected</strong> in seconds — with confidence scores.
+      </p>
+      <a href="#upload-section" class="hero-cta" id="hero-cta">
+        <span>Start Analysis</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+    <div class="hero-visual">
+      <div class="cell-animation">
+        <div class="cell cell-1"></div>
+        <div class="cell cell-2"></div>
+        <div class="cell cell-3"></div>
+        <div class="cell cell-ring"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════ UPLOAD SECTION ═══════ -->
+  <section class="section" id="upload-section">
+    <div class="container">
+      <h2 class="section-title">Analyze Blood Smear</h2>
+      <p class="section-desc">Drag &amp; drop a microscopy image or click the area below to browse your files.</p>
+
+      <div class="analysis-grid">
+        <!-- Upload card -->
+        <div class="glass-card upload-card" id="upload-card">
+          <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload blood smear image">
+            <div class="dropzone-idle" id="dropzone-idle">
+              <svg class="upload-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="8" y="8" width="48" height="48" rx="12" stroke="currentColor" stroke-width="2"
+                  stroke-dasharray="6 4" />
+                <path d="M32 42V22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+                <path d="M24 30l8-8 8 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              <p class="dropzone-text">Drop image here or <span class="browse-link">browse</span></p>
+              <p class="dropzone-hint">Supports PNG, JPG, JPEG, BMP, TIFF · Max 16 MB</p>
+            </div>
+            <div class="dropzone-preview hidden" id="dropzone-preview">
+              <img id="preview-img" alt="Blood smear preview" />
+              <button class="btn-remove" id="btn-remove" aria-label="Remove image" title="Remove image">&times;</button>
+            </div>
+            <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.bmp,.tiff" hidden />
+          </div>
+          <button class="btn-analyze" id="btn-analyze" disabled>
+            <span class="btn-text">Analyze Image</span>
+            <div class="spinner hidden" id="spinner"></div>
+          </button>
+        </div>
+
+        <!-- Results card -->
+        <div class="glass-card results-card hidden" id="results-card">
+          <div class="results-header">
+            <h3>Analysis Results</h3>
+            <div class="result-icon" id="result-icon"></div>
+          </div>
+
+          <div class="result-label-wrap">
+            <span class="result-label" id="result-label"></span>
+          </div>
+
+          <div class="confidence-section">
+            <div class="conf-row">
+              <span class="conf-name">Confidence</span>
+              <span class="conf-value" id="conf-value"></span>
+            </div>
+            <div class="conf-bar-track">
+              <div class="conf-bar-fill" id="conf-bar-fill"></div>
+            </div>
+          </div>
+
+          <div class="prob-grid">
+            <div class="prob-item prob-danger">
+              <span class="prob-dot danger"></span>
+              <span class="prob-name">Parasitized</span>
+              <span class="prob-value" id="prob-parasitized">—</span>
+            </div>
+            <div class="prob-item prob-safe">
+              <span class="prob-dot safe"></span>
+              <span class="prob-name">Uninfected</span>
+              <span class="prob-value" id="prob-uninfected">—</span>
+            </div>
+          </div>
+
+          <button class="btn-new" id="btn-new">New Analysis</button>
+        </div>
+
+        <!-- Error card (reuses result slot) -->
+        <div class="glass-card error-card hidden" id="error-card">
+          <div class="error-icon">⚠️</div>
+          <p class="error-msg" id="error-msg"></p>
+          <button class="btn-new" id="btn-error-dismiss">Try Again</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ HOW IT WORKS ═══════ -->
+  <section class="section section-alt" id="how-it-works">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-desc">Our pipeline processes blood smear images through a trained Convolutional Neural Network.
+      </p>
+
+      <div class="steps-grid">
+        <div class="step-card glass-card">
+          <div class="step-num">01</div>
+          <div class="step-icon">📤</div>
+          <h3>Upload</h3>
+          <p>Upload a microscopy image of a thin blood smear stained with Giemsa.</p>
+        </div>
+        <div class="step-connector"><svg viewBox="0 0 40 20">
+            <path d="M0 10h40" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4" />
+            <path d="M32 4l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2" />
+          </svg></div>
+        <div class="step-card glass-card">
+          <div class="step-num">02</div>
+          <div class="step-icon">🧠</div>
+          <h3>CNN Analysis</h3>
+          <p>The image is resized to 128×128 px and fed through a deep Convolutional Neural Network.</p>
+        </div>
+        <div class="step-connector"><svg viewBox="0 0 40 20">
+            <path d="M0 10h40" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4" />
+            <path d="M32 4l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2" />
+          </svg></div>
+        <div class="step-card glass-card">
+          <div class="step-num">03</div>
+          <div class="step-icon">📊</div>
+          <h3>Results</h3>
+          <p>Get an instant classification — <strong>Parasitized</strong> or <strong>Uninfected</strong> — with a
+            confidence score.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ ABOUT ═══════ -->
+  <section class="section" id="about">
+    <div class="container">
+      <h2 class="section-title">About</h2>
+      <div class="about-content glass-card">
+        <p>
+          Malaria is a life-threatening disease caused by <em>Plasmodium</em> parasites transmitted through infected
+          mosquito bites.
+          Timely and accurate microscopic diagnosis is critical — manual examination of blood smears is labour-intensive
+          and error-prone.
+        </p>
+        <p>
+          <strong>MalariaVision</strong> uses a Convolutional Neural Network trained on the
+          <a href="https://www.kaggle.com/datasets/iarunava/cell-images-for-detecting-malaria" target="_blank"
+            rel="noopener">NIH Malaria Cell Images</a>
+          dataset to automate detection. The model classifies individual cell images as either containing
+          <em>Plasmodium</em> parasites
+          (<span class="tag-danger">Parasitized</span>) or being free of infection (<span
+            class="tag-safe">Uninfected</span>).
+        </p>
+        <div class="disclaimer">
+          <strong>⚠️ Disclaimer:</strong> This tool is intended for educational and research purposes only.
+          It is <em>not</em> a certified medical device and should not be used for clinical diagnosis.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FOOTER ═══════ -->
+  <footer class="footer">
+    <p>&copy; 2026 MalariaVision &middot; Built with Flask &amp; TensorFlow/Keras</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
